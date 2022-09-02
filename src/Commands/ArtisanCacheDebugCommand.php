@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Juampi92\ArtisanCacheDebug\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class ArtisanCacheDebugCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'artisan-cache-debug';
 
     public $description = 'My command';
 
