@@ -8,11 +8,17 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:5.0
+        ports:
+          - 6379:6379
+
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest]
         php: [8.1]
         laravel: [9.*]
         stability: [prefer-lowest, prefer-stable]
@@ -32,6 +38,9 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
+        env:
+          REDIS_CONFIGURE_OPTS: --enable-redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-zstd --with-libzstd --enable-redis-lz4 --with-liblz4
+          REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
 
       - name: Setup problem matchers
         run: |
@@ -44,4 +53,9 @@ jobs:
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Execute tests
-        run: vendor/bin/pest
+        run: vendor/bin/pest --verbose
+        env:
+          CACHE_DRIVER: redis
+          REDIS_HOST=redis
+          REDIS_PASSWORD=null
+          REDIS_PORT=6379

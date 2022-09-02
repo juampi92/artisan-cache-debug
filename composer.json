@@ -24,6 +24,7 @@
     },
     "require-dev": {
         "laravel/pint": "^1.0",
+        "laravel/sail": "^1.15",
         "nunomaduro/collision": "^6.0",
         "nunomaduro/larastan": "^2.0.1",
         "orchestra/testbench": "^7.0",
