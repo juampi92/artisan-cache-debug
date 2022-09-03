@@ -56,6 +56,5 @@ jobs:
         run: vendor/bin/pest --verbose
         env:
           CACHE_DRIVER: redis
-          REDIS_HOST=redis
-          REDIS_PASSWORD=null
-          REDIS_PORT=6379
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
