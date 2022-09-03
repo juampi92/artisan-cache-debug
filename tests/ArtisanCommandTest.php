@@ -40,6 +40,6 @@ it('displays existing cache keys with it\'s data', function () {
     $command = $this->artisan(CacheDebugCommand::class);
 
     // Assert
-        $command->expectsOutputToContain('my-key')
-        ->assertSuccessful();
+    $command->expectsOutputToContain('my-key')
+    ->assertSuccessful();
 });

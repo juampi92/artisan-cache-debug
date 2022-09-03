@@ -9,7 +9,6 @@ class CacheRecord
         public readonly string $type,
         public readonly int $bytes,
         public readonly ?int $ttl,
-    )
-    {
+    ) {
     }
 }
