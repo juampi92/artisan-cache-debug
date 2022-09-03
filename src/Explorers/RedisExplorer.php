@@ -30,7 +30,7 @@ class RedisExplorer implements Explorer
             ->map(fn ($key) => $this->getRecordInformation($key))
             // Filtering
             // Sorting
-            ;
+;
     }
 
     /**
