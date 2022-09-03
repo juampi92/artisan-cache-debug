@@ -62,6 +62,7 @@ echo $artisanCacheDebug->echoPhrase('Hello, Juampi92!');
 ## Testing
 
 ```bash
+sail up -d
 composer test
 ```
 
