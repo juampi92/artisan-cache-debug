@@ -34,7 +34,7 @@ class CacheDebugCommand extends Command
         $records->each(function (CacheRecord $record) {
             $this->components->twoColumnDetail(
                 $record->key,
-                $record->bytes,
+                $record->bits,
             );
         });
 

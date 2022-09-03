@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Juampi92\ArtisanCacheDebug\Contracts\Explorer;
 use Juampi92\ArtisanCacheDebug\DTOs\CacheRecord;
+use Juampi92\ArtisanCacheDebug\Support\TypeGuesser;
 use Redis;
 
 class RedisExplorer implements Explorer
@@ -28,9 +29,8 @@ class RedisExplorer implements Explorer
             // Format
             ->map(fn ($key) => $this->getRecordInformation($key))
             // Filtering
-            // ->filter()
             // Sorting
-            ->sortByDesc('bytes');
+            ;
     }
 
     /**
@@ -43,15 +43,15 @@ class RedisExplorer implements Explorer
 
     private function getRecordInformation(string $key): CacheRecord
     {
-        // $value = $this->redis->get($key);
+        $value = $this->redis->get($key);
         $ttl = $this->redis->ttl($key);
 
         $prefixlessKey = Str::replaceFirst($this->prefix, '', $key);
 
         return new CacheRecord(
             key: $prefixlessKey,
-            type: '?', // $this->getType($this->unserialize($value)),
-            bytes: $this->redis->bitcount($key),
+            type: TypeGuesser::guess($value),
+            bits: $this->redis->bitcount($key),
             ttl: $ttl,
         );
     }
