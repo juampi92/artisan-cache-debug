@@ -8,7 +8,8 @@ use Juampi92\ArtisanCacheDebug\DTOs\CacheRecord;
 
 class CacheDebugCommand extends Command
 {
-    public $signature = 'cache:debug';
+    public $signature = 'cache:debug
+                                    {--key=\* : Filter keys. Use redis filter patterns.}';
 
     public $description = 'Debug cache.';
 
@@ -21,7 +22,7 @@ class CacheDebugCommand extends Command
         }
 
         $explorer = $manager->getExplorer();
-        $records = $explorer->getRecords();
+        $records = $explorer->getRecords($this->getMatch());
 
         if ($records->isEmpty()) {
             $this->error('No records.');
@@ -39,5 +40,16 @@ class CacheDebugCommand extends Command
         });
 
         return self::SUCCESS;
+    }
+
+    private function getMatch(): string
+    {
+        $match = $this->option('key');
+
+        if ($match === '\*') {
+            return '*';
+        }
+
+        return $match;
     }
 }

@@ -43,3 +43,24 @@ it('displays existing cache keys with it\'s data', function () {
     $command->expectsOutputToContain('my-key')
     ->assertSuccessful();
 });
+
+
+it('filters keys', function () {
+    // Arrange
+    $this->artisan(ClearCommand::class);
+
+    Cache::put('apple:1', 'my-value');
+    Cache::put('apple:2', 'my-value');
+    Cache::put('banana:1', 'my-value');
+    Cache::put('banana:2', 'my-value');
+
+    // Act
+    $command = $this->artisan(CacheDebugCommand::class, [
+        '--key' => 'apple:*',
+    ]);
+
+    // Assert
+    $command->expectsOutputToContain('apple')
+        ->doesntExpectOutputToContain('banana')
+        ->assertSuccessful();
+});
