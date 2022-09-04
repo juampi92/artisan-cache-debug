@@ -7,5 +7,5 @@ use Illuminate\Support\LazyCollection;
 
 interface Explorer
 {
-    public function getRecords(): Collection|LazyCollection;
+    public function getRecords(string $match = '*'): Collection|LazyCollection;
 }

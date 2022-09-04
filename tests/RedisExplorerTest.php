@@ -48,7 +48,6 @@ it('Should get CacheRecords from redis', function () {
         ->ttl->toBe(60);
 });
 
-
 it('Should filter keys', function () {
     // Arrange
     $this->artisan(ClearCommand::class);

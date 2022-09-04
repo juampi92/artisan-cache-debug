@@ -44,7 +44,6 @@ it('displays existing cache keys with it\'s data', function () {
     ->assertSuccessful();
 });
 
-
 it('filters keys', function () {
     // Arrange
     $this->artisan(ClearCommand::class);
@@ -64,3 +63,24 @@ it('filters keys', function () {
         ->doesntExpectOutputToContain('banana')
         ->assertSuccessful();
 });
+
+it('filters forever results', function () {
+    // Arrange
+    $this->artisan(ClearCommand::class);
+
+    Cache::put('apple:1', 'my-value', 15);
+    Cache::put('apple:2', 'my-value', 15);
+    Cache::put('forever:1', 'my-value');
+    Cache::put('forever:2', 'my-value');
+
+    // Act
+    $command = $this->artisan(CacheDebugCommand::class, [
+        '--forever' => true,
+    ]);
+
+    // Assert
+    $command
+        ->expectsOutputToContain('forever')
+        ->doesntExpectOutputToContain('apple')
+        ->assertSuccessful();
+})->only();

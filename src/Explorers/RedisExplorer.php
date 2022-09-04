@@ -21,9 +21,9 @@ class RedisExplorer implements Explorer
         $this->databasePrefix = $this->redis->client()->getOption(Redis::OPT_PREFIX);
     }
 
-    public function getRecords($match = '*', $pageSize = 35): LazyCollection
+    public function getRecords(string $match = '*'): LazyCollection
     {
-        return $this->getKeys($match, $pageSize)
+        return $this->getKeys($match, 35)
             // Fix keys
             ->map(fn ($key) => Str::replaceFirst($this->databasePrefix, '', $key))
             // Format
