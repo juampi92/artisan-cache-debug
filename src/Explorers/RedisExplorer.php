@@ -3,6 +3,7 @@
 namespace Juampi92\ArtisanCacheDebug\Explorers;
 
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Juampi92\ArtisanCacheDebug\Contracts\Explorer;
@@ -21,7 +22,10 @@ class RedisExplorer implements Explorer
         $this->databasePrefix = $this->redis->client()->getOption(Redis::OPT_PREFIX);
     }
 
-    public function getRecords(string $match = '*'): LazyCollection
+    /**
+     * @return Enumerable<array-key, CacheRecord>
+     */
+    public function getRecords(string $match = '*'): Enumerable
     {
         return $this->getKeys($match, 35)
             // Fix keys
@@ -30,7 +34,10 @@ class RedisExplorer implements Explorer
             ->map(fn ($key) => $this->getRecordInformation($key));
     }
 
-    private function getKeys($match, $pageSize): LazyCollection
+    /**
+     * @return LazyCollection<array-key, string>
+     */
+    private function getKeys(string $match, int $pageSize): LazyCollection
     {
         return new LazyCollection(function () use ($pageSize, $match) {
             $cursor = null;
@@ -67,9 +74,9 @@ class RedisExplorer implements Explorer
 
         return new CacheRecord(
             key: $prefixlessKey,
-            type: TypeGuesser::guess($value),
+            type: TypeGuesser::guess($value ?: ''),
             bits: $this->redis->bitcount($key),
-            ttl: $ttl,
+            ttl: $ttl === false ? null : $ttl,
         );
     }
 }

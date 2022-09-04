@@ -83,4 +83,4 @@ it('filters forever results', function () {
         ->expectsOutputToContain('forever')
         ->doesntExpectOutputToContain('apple')
         ->assertSuccessful();
-})->only();
+});

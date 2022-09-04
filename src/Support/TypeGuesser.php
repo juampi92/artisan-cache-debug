@@ -10,6 +10,10 @@ class TypeGuesser
      */
     public static function guess(string $serialized): string
     {
+        if (! $serialized) {
+            return 'null';
+        }
+
         $parts = explode(':', $serialized, 3);
         $primitive = $parts[0];
 
@@ -28,8 +32,8 @@ class TypeGuesser
             'i' => 'int',
             'd' => 'float',
             'b' => 'bool',
-            'O' => substr($parts[2], 1, $parts[1]),
-            default => dd($serialized) and 'unknown',
+            'O' => substr($parts[2], 1, (int) $parts[1]),
+            default => 'unknown',
         };
     }
 }

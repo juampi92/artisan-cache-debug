@@ -2,10 +2,14 @@
 
 namespace Juampi92\ArtisanCacheDebug\Contracts;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Enumerable;
+use Juampi92\ArtisanCacheDebug\DTOs\CacheRecord;
 
 interface Explorer
 {
-    public function getRecords(string $match = '*'): Collection|LazyCollection;
+    /**
+     * @param  string  $match
+     * @return Enumerable<array-key, CacheRecord>
+     */
+    public function getRecords(string $match = '*'): Enumerable;
 }

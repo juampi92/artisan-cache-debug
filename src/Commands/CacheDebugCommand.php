@@ -3,10 +3,10 @@
 namespace Juampi92\ArtisanCacheDebug\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
-use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Enumerable;
 use Juampi92\ArtisanCacheDebug\CacheExplorerManager;
 use Juampi92\ArtisanCacheDebug\DTOs\CacheRecord;
+use Juampi92\ArtisanCacheDebug\Support\ByteFormatter;
 
 class CacheDebugCommand extends Command
 {
@@ -45,7 +45,7 @@ class CacheDebugCommand extends Command
 
     private function getMatch(): string
     {
-        $match = $this->option('key');
+        $match = (string) $this->option('key');
 
         if ($match === '\*') {
             return '*';
@@ -54,25 +54,36 @@ class CacheDebugCommand extends Command
         return $match;
     }
 
-    private function printRecords(Collection|LazyCollection $records): void
+    /**
+     * @param  Enumerable<array-key, CacheRecord>  $records
+     */
+    private function printRecords(Enumerable $records): void
     {
         // Print all records.
         $records->each(function (CacheRecord $record) {
             $this->components->twoColumnDetail(
                 $record->key,
-                $record->bits,
+                ByteFormatter::fromBits($record->bits),
             );
         });
     }
 
-    private function applyFilters(Collection|LazyCollection $records): Collection|LazyCollection
+    /**
+     * @param  Enumerable<array-key, CacheRecord>  $records
+     * @return Enumerable<array-key, CacheRecord>
+     */
+    private function applyFilters(Enumerable $records): Enumerable
     {
-        $foreverFilter = $this->option('forever');
+        $foreverFilter = (bool) $this->option('forever');
 
         return $records
             ->when(
                 $foreverFilter,
-                function (Collection|LazyCollection $records) {
+                /**
+                 * @param  Enumerable<array-key, CacheRecord>  $records
+                 * @return Enumerable<array-key, CacheRecord>
+                 */
+                function (Enumerable $records): Enumerable {
                     return $records->filter(fn (CacheRecord $record) => $record->ttl === -1);
                 }
             );

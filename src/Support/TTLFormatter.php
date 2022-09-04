@@ -26,7 +26,12 @@ class TTLFormatter
     private static function formatMinutes(int $ttl): string
     {
         $minutes = (int) floor($ttl / 60);
-        $seconds = str_pad($ttl - ($minutes * 60), 2, '0', STR_PAD_LEFT);
+        $seconds = str_pad(
+            (string) ($ttl - ($minutes * 60)),
+            2,
+            '0',
+            STR_PAD_LEFT
+        );
 
         return "{$minutes}:{$seconds} min";
     }
@@ -35,7 +40,12 @@ class TTLFormatter
     {
         $ttlMin = $ttl / 60;
         $hours = (int) floor($ttlMin / 60);
-        $minutes = str_pad(floor($ttlMin - ($hours * 60)), 2, '0', STR_PAD_LEFT);
+        $minutes = str_pad(
+            (string) floor($ttlMin - ($hours * 60)),
+            2,
+            '0',
+            STR_PAD_LEFT
+        );
 
         return "{$hours}:{$minutes} h";
     }
