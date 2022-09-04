@@ -47,3 +47,29 @@ it('Should get CacheRecords from redis', function () {
         ->bits->toBe(11)
         ->ttl->toBe(60);
 });
+
+
+it('Should filter keys', function () {
+    // Arrange
+    $this->artisan(ClearCommand::class);
+
+    Cache::put('banana:1', 1, Carbon::now()->addDay());
+    Cache::put('banana:2', 1, Carbon::now()->addDay());
+    Cache::put('apple:1', 1, Carbon::now()->addDay());
+    Cache::put('apple:2', 1, Carbon::now()->addDay());
+
+    // Act
+    /** @var RedisExplorer $explorer */
+    $explorer = $this->app->make(CacheExplorerManager::class)->getExplorer();
+    $records = $explorer->getRecords('banana:*')->sortBy('key')->values()->all();
+
+    // Assert
+    expect($records)
+        ->toHaveCount(2)
+        // First:
+        ->and($records[0])
+        ->key->toBe('banana:1')
+        // Second:
+        ->and($records[1])
+        ->key->toBe('banana:2');
+});

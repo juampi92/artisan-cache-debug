@@ -40,7 +40,7 @@ class RedisExplorer implements Explorer
                 $items = $this->redis->scan(
                     $cursor,
                     [
-                        'match' => "{$this->databasePrefix}{$match}",
+                        'match' => "{$this->databasePrefix}{$this->prefix}{$match}",
                         'count' => $pageSize,
                     ]
                 );
