@@ -3,7 +3,7 @@
 namespace Juampi92\ArtisanCacheDebug\Explorers;
 
 use Illuminate\Redis\Connections\Connection;
-use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Juampi92\ArtisanCacheDebug\Contracts\Explorer;
 use Juampi92\ArtisanCacheDebug\DTOs\CacheRecord;
@@ -21,24 +21,41 @@ class RedisExplorer implements Explorer
         $this->databasePrefix = $this->redis->client()->getOption(Redis::OPT_PREFIX);
     }
 
-    public function getRecords(): Collection
+    public function getRecords($match = '*', $pageSize = 35): LazyCollection
     {
-        return $this->getAllKeys()
+        return $this->getKeys($match, $pageSize)
             // Fix keys
             ->map(fn ($key) => Str::replaceFirst($this->databasePrefix, '', $key))
             // Format
-            ->map(fn ($key) => $this->getRecordInformation($key))
-            // Filtering
-            // Sorting
-;
+            ->map(fn ($key) => $this->getRecordInformation($key));
     }
 
-    /**
-     * @return Collection<array-key, string>
-     */
-    private function getAllKeys(): Collection
+    private function getKeys($match, $pageSize): LazyCollection
     {
-        return collect($this->redis->keys('*'));
+        return new LazyCollection(function () use ($pageSize, $match) {
+            $cursor = null;
+
+            do {
+                /** @var array{0: int, 1: array<array-key, string>}|false|null $items */
+                $items = $this->redis->scan(
+                    $cursor,
+                    [
+                        'match' => "{$this->databasePrefix}{$match}",
+                        'count' => $pageSize,
+                    ]
+                );
+
+                if (! $items) {
+                    break;
+                }
+
+                [$cursor, $results] = $items;
+
+                foreach ($results as $row) {
+                    yield $row;
+                }
+            } while ($cursor > 0);
+        });
     }
 
     private function getRecordInformation(string $key): CacheRecord

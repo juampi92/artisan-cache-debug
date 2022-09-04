@@ -18,7 +18,7 @@ it('Should get CacheRecords from redis', function () {
     // Act
     /** @var RedisExplorer $explorer */
     $explorer = $this->app->make(CacheExplorerManager::class)->getExplorer();
-    $records = $explorer->getRecords()->sortBy('key')->values();
+    $records = $explorer->getRecords()->sortBy('key')->values()->all();
 
     // Assert
     expect($records)
@@ -44,6 +44,6 @@ it('Should get CacheRecords from redis', function () {
         ->and($records[3])
         ->key->toBe('4-fourth')
         ->type->toBe('float')
-        ->bits->toBe(3)
+        ->bits->toBe(11)
         ->ttl->toBe(60);
 });

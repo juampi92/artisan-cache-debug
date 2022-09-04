@@ -34,5 +34,4 @@ it('should figure out it\'s type from raw cache', function (mixed $target, strin
     ['target' => 1, 'expected' => 'int'],
     ['target' => '1.5', 'expected' => 'float'],
     ['target' => 1.5, 'expected' => 'float'],
-])
-->only();
+]);
