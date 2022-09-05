@@ -44,6 +44,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 - [x] Show only forever
 - [x] Type debug (array/collection of what?) mode
 - [x] Filter on size
+- [x] Sort by size
 - [ ] Filter on type
 - [ ] Pagination
 - [ ] Support memcache?

@@ -2,6 +2,7 @@
 
 namespace Juampi92\ArtisanCacheDebug\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Enumerable;
 use Juampi92\ArtisanCacheDebug\CacheExplorerManager;
@@ -10,10 +11,19 @@ use Juampi92\ArtisanCacheDebug\Support\ByteFormatter;
 
 class CacheDebugCommand extends Command
 {
+    /**
+     * Allowed sort properties
+     *
+     * @var array<string>
+     */
+    private const SORT_BY = ['size', 'key'];
+
     public $signature = 'cache:debug
                                     {--key=\* : Filter keys. Use redis filter patterns.}
                                     {--forever : Will only show non-expiring keys}
-                                    {--heavier-than= : Will hide keys lighter than X}';
+                                    {--heavier-than= : Will hide keys lighter than X}
+                                    {--sort-by=size : Will sort the keys by \'size\' or \'key\'}
+                                    {--sort-dir= : Set the sorting direction: \'asc\' or \'desc\'}';
 
     public $description = 'Debug cache.';
 
@@ -29,7 +39,9 @@ class CacheDebugCommand extends Command
         $records = $explorer->getRecords($this->getMatch());
 
         // Filtering
-        $records = $this->applyFilters($records);
+        $records = $this
+            ->applyFilters($records)
+            ->sortBy($this->getSortBy(), descending: $this->getSortIsDescending());
 
         if ($records->isEmpty()) {
             $this->error('No records.');
@@ -46,7 +58,7 @@ class CacheDebugCommand extends Command
 
     private function getMatch(): string
     {
-        $match = (string) $this->option('key');
+        $match = (string) $this->option('key'); // @phpstan-ignore-line
 
         if ($match === '\*') {
             return '*';
@@ -101,5 +113,30 @@ class CacheDebugCommand extends Command
                     return $records->filter(fn (CacheRecord $record) => $record->bits > $heavierThanFilter);
                 }
             );
+    }
+
+    private function getSortBy(): string
+    {
+        $sortBy = (string) $this->option('sort-by') ?: 'size';  // @phpstan-ignore-line
+
+        if (! in_array($sortBy, self::SORT_BY)) {
+            throw new Exception("It's not possible to sort by '{$sortBy}'. Use on of: ".implode(', ', self::SORT_BY));
+        }
+
+        return $sortBy;
+    }
+
+    private function getSortIsDescending(): bool
+    {
+        $sortDir = $this->option('sort-dir');
+
+        return match ($sortDir) {
+            'asc' => false,
+            'desc' => true,
+            default => match ($this->getSortBy()) {
+                'size' => true,
+                default => false,
+            }
+        };
     }
 }

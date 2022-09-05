@@ -1,9 +1,5 @@
 parameters:
 	ignoreErrors:
-		-
-			message: "#^Cannot cast array\\|bool\\|string\\|null to string\\.$#"
-			count: 1
-			path: src/Commands/CacheDebugCommand.php
 
 		-
 			message: "#^Parameter \\#2 \\$pattern of method Redis\\:\\:scan\\(\\) expects string\\|null, array\\<string, int\\|string\\> given\\.$#"
