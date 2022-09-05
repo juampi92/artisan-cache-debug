@@ -34,6 +34,8 @@ it('should figure out its type from raw cache', function (mixed $target, string 
     ['target' => 1, 'expected' => 'int'],
     ['target' => '1.5', 'expected' => 'float'],
     ['target' => 1.5, 'expected' => 'float'],
+    ['target' => 'my:string', 'expected' => 'unknown'],
+    ['target' => 'O:w:"Hi Mark"', 'expected' => 'unknown'],
 ]);
 
 it('should figure out its array type', function (mixed $target, string $expected) {

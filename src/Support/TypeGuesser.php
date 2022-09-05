@@ -83,7 +83,7 @@ class TypeGuesser
             'd' => 'float',
             'b' => 'bool',
             'O' => $rest ?
-                substr($rest[2], 1, (int) $rest[1])
+                substr($rest[2], 1, (int) $rest[1]) ?: 'unknown'
                 : 'object',
             default => 'unknown',
         };
@@ -103,6 +103,10 @@ class TypeGuesser
     private static function classType(array $parts): string
     {
         $class = substr($parts[2], 1, (int) $parts[1]);
+
+        if (! $class) {
+            return 'unknown';
+        }
 
         if (! in_array($class, [Collection::class, EloquentCollection::class])) {
             return $class;
