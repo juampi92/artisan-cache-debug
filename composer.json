@@ -46,9 +46,14 @@
         }
     },
     "scripts": {
+        "all": [
+            "@composer format",
+            "@composer analyse",
+            "@composer test"
+        ],
         "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
         "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
+        "test-coverage": "vendor/bin/pest --coverage-html=build/coverage",
         "format": "vendor/bin/pint"
     },
     "config": {

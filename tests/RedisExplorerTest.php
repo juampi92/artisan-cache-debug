@@ -32,7 +32,7 @@ it('Should get CacheRecords from redis', function () {
         // Second:
         ->and($records[1])
         ->key->toBe('2-second')
-        ->type->toBe('array')
+        ->type->toBe('array<int>')
         ->ttl->toBe(60 * 60 * 24)
         // Third:
         ->and($records[2])

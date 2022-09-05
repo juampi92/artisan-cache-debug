@@ -40,10 +40,12 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ### To-do
 
-- [ ] Add key-name filter
-- [ ] Show only forever
-- [ ] Limit to display
-- [ ] Type debug (array of what) mode
+- [x] Add key-name filter
+- [x] Show only forever
+- [x] Type debug (array/collection of what?) mode
+- [ ] Filter on size
+- [ ] Filter on type
+- [ ] Pagination
 - [ ] Support memcache?
 
 ## Security Vulnerabilities
