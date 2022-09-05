@@ -43,7 +43,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 - [x] Add key-name filter
 - [x] Show only forever
 - [x] Type debug (array/collection of what?) mode
-- [ ] Filter on size
+- [x] Filter on size
 - [ ] Filter on type
 - [ ] Pagination
 - [ ] Support memcache?

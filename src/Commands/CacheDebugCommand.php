@@ -12,7 +12,8 @@ class CacheDebugCommand extends Command
 {
     public $signature = 'cache:debug
                                     {--key=\* : Filter keys. Use redis filter patterns.}
-                                    {--forever : Will only show non-expiring keys}';
+                                    {--forever : Will only show non-expiring keys}
+                                    {--heavier-than= : Will hide keys lighter than X}';
 
     public $description = 'Debug cache.';
 
@@ -75,6 +76,9 @@ class CacheDebugCommand extends Command
     private function applyFilters(Enumerable $records): Enumerable
     {
         $foreverFilter = (bool) $this->option('forever');
+        $heavierThanFilter = $this->option('heavier-than') ?
+            ByteFormatter::fromString((string) $this->option('heavier-than')) // @phpstan-ignore-line
+            : null;
 
         return $records
             ->when(
@@ -85,6 +89,16 @@ class CacheDebugCommand extends Command
                  */
                 function (Enumerable $records): Enumerable {
                     return $records->filter(fn (CacheRecord $record) => $record->ttl === -1);
+                }
+            )
+            ->when(
+                ! is_null($heavierThanFilter),
+                /**
+                 * @param  Enumerable<array-key, CacheRecord>  $records
+                 * @return Enumerable<array-key, CacheRecord>
+                 */
+                function (Enumerable $records) use ($heavierThanFilter): Enumerable {
+                    return $records->filter(fn (CacheRecord $record) => $record->bits > $heavierThanFilter);
                 }
             );
     }

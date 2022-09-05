@@ -84,3 +84,22 @@ it('filters forever results', function () {
         ->doesntExpectOutputToContain('apple')
         ->assertSuccessful();
 });
+
+it('filters by size', function () {
+    // Arrange
+    $this->artisan(ClearCommand::class);
+
+    Cache::put('this-is-low', '12345'); // 17 bits
+    Cache::put('this-is-high', 'ABCDE'); // 38 bits
+
+    // Act
+    $command = $this->artisan(CacheDebugCommand::class, [
+        '--heavier-than' => '18bit',
+    ]);
+
+    // Assert
+    $command
+        ->expectsOutputToContain('this-is-high')
+        ->doesntExpectOutputToContain('this-is-low')
+        ->assertSuccessful();
+});
