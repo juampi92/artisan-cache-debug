@@ -26,7 +26,7 @@ it('calling the command with empty records works', function () {
 
     // Assert
     $command
-        ->expectsOutputToContain('No records.')
+        ->expectsOutputToContain('The cache seems to be empty.')
         ->assertSuccessful();
 });
 

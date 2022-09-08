@@ -2,13 +2,17 @@
 
 namespace Juampi92\ArtisanCacheDebug\Commands;
 
+use Closure;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Enumerable;
 use Juampi92\ArtisanCacheDebug\CacheExplorerManager;
 use Juampi92\ArtisanCacheDebug\DTOs\CacheRecord;
 use Juampi92\ArtisanCacheDebug\Support\ByteFormatter;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Terminal;
 
+#[AsCommand(name: 'cache:debug')]
 class CacheDebugCommand extends Command
 {
     public $signature = 'cache:debug
@@ -19,7 +23,12 @@ class CacheDebugCommand extends Command
                                     {--sort-dir= : Set the sorting direction: \'asc\' or \'desc\'.}
                                     {--with-details : Show the type of every cache record.}';
 
-    public $description = 'Debug cache.';
+    public $description = 'Debug cache keys.';
+
+    /**
+     * The terminal width resolver callback.
+     */
+    protected static ?Closure $terminalWidthResolver = null;
 
     public function handle(CacheExplorerManager $manager): int
     {
@@ -49,17 +58,6 @@ class CacheDebugCommand extends Command
         $this->printFooter($records);
 
         return self::SUCCESS;
-    }
-
-    private function getMatch(): string
-    {
-        $match = (string) $this->option('key'); // @phpstan-ignore-line
-
-        if ($match === '\*') {
-            return '*';
-        }
-
-        return $match;
     }
 
     /**
@@ -96,6 +94,21 @@ class CacheDebugCommand extends Command
             );
     }
 
+    /*
+     * Access command options.
+     */
+
+    private function getMatch(): string
+    {
+        $match = (string) $this->option('key'); // @phpstan-ignore-line
+
+        if ($match === '\*') {
+            return '*';
+        }
+
+        return $match;
+    }
+
     private function getSortBy(): string
     {
         $sortBy = (string) $this->option('sort-by') ?: 'size';  // @phpstan-ignore-line
@@ -122,38 +135,59 @@ class CacheDebugCommand extends Command
         };
     }
 
+    /*
+     * Print methods.
+     */
+
     /**
      * @param  Enumerable<array-key, CacheRecord>  $records
      */
     private function printRecords(Enumerable $records): void
     {
-        $records->each(function (CacheRecord $record) {
+        $terminalWidth = $this->getTerminalWidth();
+
+        $records->each(function (CacheRecord $record) use ($terminalWidth): void {
             $bytes = ByteFormatter::fromBits($record->bits);
             $bytesStyle = $this->getBytesStyle($record->bits);
 
-            $details = $this->option('with-details') ?
-                " <fg=white;options=underscore>{$record->type}</> "
-                : '';
+            $details = $this->option('with-details') ? $record->type : '';
 
-            $this->components->twoColumnDetail(
-                "<fg=bright-yellow>{$record->key}</>",
-                "{$details}<{$bytesStyle}>{$bytes}</>",
+            $dots = str_repeat('.', max(
+                $terminalWidth - mb_strlen(" {$record->key} $bytes$details") - 6 - ($details ? 1 : 0), 0
+            ));
+
+            $this->output->writeln(
+                "<fg=bright-yellow>{$record->key}</> ".
+                "<fg=gray>$dots</>".
+                ($details ? "<fg=white;options=underscore>{$details}</> " : '').
+                "<{$bytesStyle}>{$bytes}</>"
             );
         });
     }
 
     /**
-     * @param  Enumerable<CacheRecord>  $records
-     * @return void
+     * @param  Enumerable<array-key, CacheRecord>  $records
      */
     private function printFooter(Enumerable $records): void
     {
-        $this->newLine();
-        $this->line("<fg=blue;options=bold>Showing [{$records->count()}] records.</>");
+        $terminalWidth = $this->getTerminalWidth();
 
+        $count = $records->count();
         $totalSize = ByteFormatter::fromBits($records->sum('bits'));
-        $this->line("<fg=blue;options=bold>Total size: {$totalSize}</>");
+
+        $unstyledFooter = "Showing [{$count}] records. Total size: {$totalSize}";
+
+        $this->newLine();
+
+        $offset = $terminalWidth - mb_strlen($unstyledFooter) - 7;
+        $spaces = str_repeat(' ', $offset);
+
+        $this->line($spaces."<fg=blue;options=bold>Showing [{$count}] records. Total size: {$totalSize}</>");
     }
+
+    /*
+     * Utilities.
+     */
 
     private function getBytesStyle(int $bits): string
     {
@@ -163,5 +197,12 @@ class CacheDebugCommand extends Command
             $bits < (8 * 1024 * 1024 * 500) => 'fg=red',
             default => 'fg=bright-red;options=bold',
         };
+    }
+
+    private function getTerminalWidth(): int
+    {
+        return is_null(static::$terminalWidthResolver)
+            ? (new Terminal)->getWidth()
+            : call_user_func(static::$terminalWidthResolver);
     }
 }
