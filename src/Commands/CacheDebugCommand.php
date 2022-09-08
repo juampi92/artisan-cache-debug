@@ -24,7 +24,7 @@ class CacheDebugCommand extends Command
     public function handle(CacheExplorerManager $manager): int
     {
         if (! $manager->isUsingRedis()) {
-            $this->error('This command only supports redis cache.');
+            $this->components->error('This command only supports the \'redis\' cache driver.');
 
             return self::FAILURE;
         }
@@ -38,12 +38,12 @@ class CacheDebugCommand extends Command
             ->sortBy($this->getSortBy(), descending: $this->getSortIsDescending());
 
         if ($records->isEmpty()) {
-            $this->error('No records.');
+            $this->components->warn('The cache seems to be empty.');
 
             return self::SUCCESS;
         }
 
-        $this->output->newLine(2);
+        $this->output->newLine(1);
 
         $this->printRecords($records);
         $this->printFooter($records);
@@ -127,23 +127,19 @@ class CacheDebugCommand extends Command
      */
     private function printRecords(Enumerable $records): void
     {
-        // Print all records.
         $records->each(function (CacheRecord $record) {
+            $bytes = ByteFormatter::fromBits($record->bits);
+            $bytesStyle = $this->getBytesStyle($record->bits);
+
+            $details = $this->option('with-details') ?
+                " <fg=white;options=underscore>{$record->type}</> "
+                : '';
+
             $this->components->twoColumnDetail(
-                $record->key,
-                ByteFormatter::fromBits($record->bits),
+                "<fg=bright-yellow>{$record->key}</>",
+                "{$details}<{$bytesStyle}>{$bytes}</>",
             );
-            $this->printRecordDetails($record);
         });
-    }
-
-    private function printRecordDetails(CacheRecord $record): void
-    {
-        if (! $this->option('with-details')) {
-            return;
-        }
-
-        $this->line("   ↳ <options=bold>Type:</> <options=underscore>{$record->type}</>");
     }
 
     /**
@@ -152,9 +148,20 @@ class CacheDebugCommand extends Command
      */
     private function printFooter(Enumerable $records): void
     {
-        $totalSize = ByteFormatter::fromBits($records->sum('bits'));
-
         $this->newLine();
-        $this->info("Total keys: {$records->count()}. Total size: {$totalSize}");
+        $this->line("<fg=blue;options=bold>Showing [{$records->count()}] records.</>");
+
+        $totalSize = ByteFormatter::fromBits($records->sum('bits'));
+        $this->line("<fg=blue;options=bold>Total size: {$totalSize}</>");
+    }
+
+    private function getBytesStyle(int $bits): string
+    {
+        return match (true) {
+            $bits < (8 * 1024) => 'fg=green',
+            $bits < (8 * 1024 * 1024) => 'fg=yellow',
+            $bits < (8 * 1024 * 1024 * 500) => 'fg=red',
+            default => 'fg=bright-red;options=bold',
+        };
     }
 }
