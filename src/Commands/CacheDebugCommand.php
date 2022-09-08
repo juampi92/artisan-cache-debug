@@ -139,7 +139,7 @@ class CacheDebugCommand extends Command
 
     private function printRecordDetails(CacheRecord $record): void
     {
-        if (!$this->option('with-details')) {
+        if (! $this->option('with-details')) {
             return;
         }
 
