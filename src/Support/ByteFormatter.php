@@ -20,7 +20,7 @@ class ByteFormatter
 
     public static function fromBits(int $bits, int $precision = 1): string
     {
-        $bytes = $bits / 8;
+        $bytes = ceil($bits / 8);
 
         return match (true) {
             $bits < 8 => "{$bits} bits",

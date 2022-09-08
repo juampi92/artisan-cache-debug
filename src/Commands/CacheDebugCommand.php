@@ -11,19 +11,13 @@ use Juampi92\ArtisanCacheDebug\Support\ByteFormatter;
 
 class CacheDebugCommand extends Command
 {
-    /**
-     * Allowed sort properties
-     *
-     * @var array<string>
-     */
-    private const SORT_BY = ['size', 'key'];
-
     public $signature = 'cache:debug
                                     {--key=\* : Filter keys. Use redis filter patterns.}
-                                    {--forever : Will only show non-expiring keys}
-                                    {--heavier-than= : Will hide keys lighter than X}
-                                    {--sort-by=size : Will sort the keys by \'size\' or \'key\'}
-                                    {--sort-dir= : Set the sorting direction: \'asc\' or \'desc\'}';
+                                    {--forever : Will only show non-expiring keys.}
+                                    {--heavier-than= : Will hide keys lighter than X.}
+                                    {--sort-by=size : Will sort the keys by \'size\' or \'key\'.}
+                                    {--sort-dir= : Set the sorting direction: \'asc\' or \'desc\'.}
+                                    {--with-details : Show the type of every cache record.}';
 
     public $description = 'Debug cache.';
 
@@ -52,6 +46,7 @@ class CacheDebugCommand extends Command
         $this->output->newLine(2);
 
         $this->printRecords($records);
+        $this->printFooter($records);
 
         return self::SUCCESS;
     }
@@ -65,20 +60,6 @@ class CacheDebugCommand extends Command
         }
 
         return $match;
-    }
-
-    /**
-     * @param  Enumerable<array-key, CacheRecord>  $records
-     */
-    private function printRecords(Enumerable $records): void
-    {
-        // Print all records.
-        $records->each(function (CacheRecord $record) {
-            $this->components->twoColumnDetail(
-                $record->key,
-                ByteFormatter::fromBits($record->bits),
-            );
-        });
     }
 
     /**
@@ -119,11 +100,11 @@ class CacheDebugCommand extends Command
     {
         $sortBy = (string) $this->option('sort-by') ?: 'size';  // @phpstan-ignore-line
 
-        if (! in_array($sortBy, self::SORT_BY)) {
-            throw new Exception("It's not possible to sort by '{$sortBy}'. Use on of: ".implode(', ', self::SORT_BY));
-        }
-
-        return $sortBy;
+        return match ($sortBy) {
+            'size' => 'bits',
+            'key' => 'key',
+            default => throw new Exception("It's not possible to sort by '{$sortBy}'"),
+        };
     }
 
     private function getSortIsDescending(): bool
@@ -134,9 +115,46 @@ class CacheDebugCommand extends Command
             'asc' => false,
             'desc' => true,
             default => match ($this->getSortBy()) {
-                'size' => true,
+                'bits' => true,
+                'key' => false,
                 default => false,
             }
         };
+    }
+
+    /**
+     * @param  Enumerable<array-key, CacheRecord>  $records
+     */
+    private function printRecords(Enumerable $records): void
+    {
+        // Print all records.
+        $records->each(function (CacheRecord $record) {
+            $this->components->twoColumnDetail(
+                $record->key,
+                ByteFormatter::fromBits($record->bits),
+            );
+            $this->printRecordDetails($record);
+        });
+    }
+
+    private function printRecordDetails(CacheRecord $record): void
+    {
+        if (!$this->option('with-details')) {
+            return;
+        }
+
+        $this->line("   ↳ <options=bold>Type:</> <options=underscore>{$record->type}</>");
+    }
+
+    /**
+     * @param  Enumerable<CacheRecord>  $records
+     * @return void
+     */
+    private function printFooter(Enumerable $records): void
+    {
+        $totalSize = ByteFormatter::fromBits($records->sum('bits'));
+
+        $this->newLine();
+        $this->info("Total keys: {$records->count()}. Total size: {$totalSize}");
     }
 }

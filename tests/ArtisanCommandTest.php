@@ -103,3 +103,23 @@ it('filters by size', function () {
         ->doesntExpectOutputToContain('this-is-low')
         ->assertSuccessful();
 });
+
+it('sorts results', function () {
+    // Arrange
+    $this->artisan(ClearCommand::class);
+
+    Cache::put('this-is-low', '12345'); // 17 bits
+    Cache::put('this-is-high', 'ABCDE'); // 38 bits
+
+    // Act
+    $command = $this->artisan(CacheDebugCommand::class, [
+        '--sort-by' => 'size',
+        '--sort-dir' => 'asc',
+    ]);
+
+    // Assert
+    $command
+        ->expectsOutputToContain('this-is-high')
+        ->doesntExpectOutputToContain('this-is-low')
+        ->assertSuccessful();
+})->skip('not finished');
