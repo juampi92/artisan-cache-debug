@@ -1,13 +1,17 @@
-# Simple artisan command to debug your redis cache
+# 🔎 `php artisan cache:debug`
+## Simple artisan command to debug your redis cache
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/juampi92/artisan-cache-debug.svg?style=flat-square)](https://packagist.org/packages/juampi92/artisan-cache-debug)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/juampi92/artisan-cache-debug/run-tests?label=tests)](https://github.com/juampi92/artisan-cache-debug/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/juampi92/artisan-cache-debug/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/juampi92/artisan-cache-debug/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/juampi92/artisan-cache-debug.svg?style=flat-square)](https://packagist.org/packages/juampi92/artisan-cache-debug)
+<p align="center">
+  <img src="/art/preview.png" width="882" alt="">
+  <p align="center">
+    <a href="https://packagist.org/packages/juampi92/artisan-cache-debug"><img src="https://img.shields.io/packagist/v/juampi92/artisan-cache-debug.svg?style=flat-square" alt="Latest Version on Packagist"></a>
+    <a href="https://github.com/juampi92/artisan-cache-debug/actions?query=workflow%3Arun-tests+branch%3Amain"><img src="https://img.shields.io/github/workflow/status/juampi92/artisan-cache-debug/run-tests?label=tests" alt="GitHub Tests Action Status"></a>
+    <a href="https://github.com/juampi92/artisan-cache-debug/actions?query=workflow%3A'Fix+PHP+code+style+issues'+branch%3Amain"><img src="https://img.shields.io/github/workflow/status/juampi92/artisan-cache-debug/Fix%20PHP%20code%20style%20issues?label=code%20style" alt="GitHub Code Style Action Status"></a>
+    <a href="https://packagist.org/packages/juampi92/artisan-cache-debug"><img src="https://img.shields.io/packagist/dt/juampi92/artisan-cache-debug.svg?style=flat-square" alt="Total Downloads"></a>
+  </p>
+</p>
 
-<< This is where your description should go. Limit it to a paragraph or two. Consider adding a small example. >>
-
-## Installation
+## 🚀 Installation
 
 You can install the package via composer:
 
@@ -19,9 +23,21 @@ composer require juampi92/artisan-cache-debug --dev
 
 ## Usage
 
+The simplest usage:
 ```php
 php artisan cache:debug
 ```
+
+### Options
+
+| Option / Flag                   | Description                                                                                                                            |
+|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `--key=*`                       | Will filter the keys. Can use wildcard. Example: `--key=*:translations`. [Read more](https://redis.io/commands/scan/#the-match-option) |
+| `--heavier-than[=HEAVIER-THAN]` | Will hide keys lighter than X. Use a format like `10bytes`, `1kb`, `8b`                                                                |
+| `--sort-by[=SORT-BY]`           | Will sort the keys by `size` or `key`. *[default: "size"]*                                                                             |
+| `--sort-dir[=SORT-DIR]`         | Set the sorting direction: `asc` or `desc`.                                                                                            |
+| `--forever`                     | Will **only** show non-expiring keys.                                                                                                  |
+| `--with-details`                | Show the type of every cache record.                                                                                                   |
 
 ## Testing
 
@@ -30,24 +46,23 @@ sail up -d
 composer test
 ```
 
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ### To-do
 
-- [x] Add key-name filter
-- [x] Show only forever
-- [x] Type debug (array/collection of what?) mode
-- [x] Filter on size
-- [x] Sort by size
-- [ ] Filter on type
+Some ideas to expand this package:
+
 - [ ] Pagination
+- [ ] Filter on type
+- [ ] Display the TTL (currently can't make it fit in the results)
 - [ ] Support memcache?
+
+## Changelog
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
 
 ## Security Vulnerabilities
 
