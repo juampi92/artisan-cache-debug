@@ -48,6 +48,11 @@ class TypeGuesser
      */
     private static function guessArraySubtype(string $content): string
     {
+        if ($content === '{}') {
+            // We can't figure the type of an empty array.
+            return '';
+        }
+
         [$keyRaw, $valueRaw] = Str::of($content)
             ->substr(1, -1)
             ->explode(';', 3);

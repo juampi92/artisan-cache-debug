@@ -17,10 +17,13 @@ it('should figure out its type from serialized', function (mixed $target, string
 })->with([
     ['target' => null, 'expected' => 'null'],
     ['target' => 'I am a string', 'expected' => 'string'],
+    ['target' => '', 'expected' => 'string'],
     ['target' => 1, 'expected' => 'int'],
     ['target' => 1.5, 'expected' => 'float'],
     ['target' => true, 'expected' => 'bool'],
     ['target' => (object) ['a' => 1], 'expected' => 'stdClass'],
+    ['target' => [], 'expected' => 'array'],
+    ['target' => (object) [], 'expected' => 'stdClass'],
 ]);
 
 it('should figure out its type from raw cache', function (mixed $target, string $expected) {
