@@ -30,14 +30,15 @@ php artisan cache:debug
 
 ### Options
 
-| Option / Flag                   | Description                                                                                                                            |
-|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| `--key=*`                       | Will filter the keys. Can use wildcard. Example: `--key=*:translations`. [Read more](https://redis.io/commands/scan/#the-match-option) |
+| Option / Flag                  | Description                                                                                                                            |
+|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `--key=*`                      | Will filter the keys. Can use wildcard. Example: `--key=*:translations`. [Read more](https://redis.io/commands/scan/#the-match-option) |
 | `--heavier-than[=HEAVIER-THAN]` | Will hide keys lighter than X. Use a format like `10bytes`, `1kb`, `8b`                                                                |
-| `--sort-by[=SORT-BY]`           | Will sort the keys by `size` or `key`. *[default: "size"]*                                                                             |
-| `--sort-dir[=SORT-DIR]`         | Set the sorting direction: `asc` or `desc`.                                                                                            |
-| `--forever`                     | Will **only** show non-expiring keys.                                                                                                  |
-| `--with-details`                | Show the type of every cache record.                                                                                                   |
+| `--sort-by[=SORT-BY]`          | Will sort the keys by `size` or `key`. *[default: "size"]*                                                                             |
+| `--sort-dir[=SORT-DIR]`        | Set the sorting direction: `asc` or `desc`.                                                                                            |
+| `--forever`                    | Will **only** show non-expiring keys.                                                                                                  |
+| `--with-details`               | Show the type of every cache record.                                                                                                   |
+| `--store=`                     | In case you want to debug a cache store other than the default.                                                                        |
 
 ## Testing
 
