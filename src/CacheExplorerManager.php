@@ -2,26 +2,26 @@
 
 namespace Juampi92\ArtisanCacheDebug;
 
+use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\RedisStore;
-use Illuminate\Contracts\Cache\Repository;
 use Juampi92\ArtisanCacheDebug\Contracts\Explorer;
 use Juampi92\ArtisanCacheDebug\Explorers\RedisExplorer;
 
 class CacheExplorerManager
 {
     public function __construct(
-        private readonly Repository $cacheManager,
+        private readonly CacheManager $cacheManager,
     ) {
     }
 
-    public function isUsingRedis(): bool
+    public function isUsingRedis(?string $store = null): bool
     {
-        return $this->cacheManager->getStore() instanceof RedisStore;
+        return $this->cacheManager->store($store)->getStore() instanceof RedisStore;
     }
 
-    public function getExplorer(): Explorer
+    public function getExplorer(?string $store = null): Explorer
     {
-        $store = $this->cacheManager->getStore();
+        $store = $this->cacheManager->store($store)->getStore();
 
         if (! $store instanceof RedisStore) {
             throw new \Exception('Store not supported.');

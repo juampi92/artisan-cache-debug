@@ -21,7 +21,8 @@ class CacheDebugCommand extends Command
                                     {--heavier-than= : Will hide keys lighter than X.}
                                     {--sort-by=size : Will sort the keys by \'size\' or \'key\'.}
                                     {--sort-dir= : Set the sorting direction: \'asc\' or \'desc\'.}
-                                    {--with-details : Show the type of every cache record.}';
+                                    {--with-details : Show the type of every cache record.}
+                                    {--store= : Specify a specific store}';
 
     public $description = 'Debug cache keys.';
 
@@ -32,13 +33,16 @@ class CacheDebugCommand extends Command
 
     public function handle(CacheExplorerManager $manager): int
     {
-        if (! $manager->isUsingRedis()) {
+        /** @var string|null $storeName */
+        $storeName = $this->option('store');
+
+        if (! $manager->isUsingRedis($storeName)) {
             $this->components->error('This command only supports the \'redis\' cache driver.');
 
             return self::FAILURE;
         }
 
-        $explorer = $manager->getExplorer();
+        $explorer = $manager->getExplorer($storeName);
         $records = $explorer->getRecords($this->getMatch());
 
         // Filtering
