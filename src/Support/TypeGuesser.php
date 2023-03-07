@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 class TypeGuesser
 {
     /**
-     * @param  string  $serialized
      * @return string|class-string
      */
     public static function guess(string $serialized): string
@@ -44,7 +43,6 @@ class TypeGuesser
 
     /**
      * @param  string  $content "{i:0;s:3:"foo";i:1;s:3:"bar";}"
-     * @return string
      */
     private static function guessArraySubtype(string $content): string
     {
@@ -74,9 +72,7 @@ class TypeGuesser
     }
 
     /**
-     * @param  string  $letter
      * @param  array{0: string, 1: string, 2: string}|null  $rest
-     * @return string
      */
     private static function letterToType(string $letter, ?array $rest = null): string
     {
@@ -103,7 +99,6 @@ class TypeGuesser
      *      to 'Illuminate\Support\Collection<int>'
      *
      * @param  array{0: string, 1: string, 2: string}  $parts
-     * @return string
      */
     private static function classType(array $parts): string
     {
